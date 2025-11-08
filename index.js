@@ -27,6 +27,45 @@ app.get('/' , (req, res)=>{
 async function run() {
   try {
     await client.connect();
+
+    const db=client.db('movieMasterPro');
+    const moviesCollection=db.collection('movies');
+
+    app.get('/movies', async(req,res)=>{
+            const cursor=collections.find();
+            const result=await cursor.toArray();
+            res.send(result);
+        });
+
+    app.post('/movies', async(req,res)=>{
+            const newMovie=req.body;
+            const result= await collections.insertOne(newMovie);
+            res.send(result);
+        });
+
+    app.patch('/movies/:id', async(req,res)=>{
+            const id=req.params.id;
+            const updatedproduct=req.body;
+            const query={_id: new ObjectId(id)};
+            const update={
+                $set:{
+                    MovieName:updatedproduct.MovieName,
+                    Genre:updatedproduct.Genre,
+                    RentPrice:updatedproduct.RentPrice
+                }
+            }
+            const result=await collections.updateOne(query,update);
+            res.send(result)
+        })
+
+    app.delete('/movies/:id', async(req,res)=>{
+            const id=req.params.id;
+            const query={_id: new ObjectId(id)};
+            const result=await collections.deleteOne(query);
+            res.send(result);
+        });
+
+
     await client.db("admin").command({ ping: 1 });
     console.log("Movie Master Pro successfully connected to MongoDB!");
   } finally {
