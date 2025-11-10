@@ -29,7 +29,7 @@ async function run() {
     await client.connect();
 
     const db=client.db('movieMasterPro');
-    const moviesCollection=db.collection('movies');
+    const collections=db.collection('movies');
 
     app.get('/movies', async(req,res)=>{
             const cursor=collections.find();
@@ -69,7 +69,6 @@ async function run() {
     await client.db("admin").command({ ping: 1 });
     console.log("Movie Master Pro successfully connected to MongoDB!");
   } finally {
-    await client.close();
   }
 }
 run().catch(console.dir);
