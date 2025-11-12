@@ -30,9 +30,33 @@ async function run() {
 
     const db=client.db('movieMasterPro');
     const collections=db.collection('movies');
+    const usersCollection=db.collection('users');
 
+    //user database
+    app.post('/users', async(req,res)=>{
+      const newUser=req.body;
+      const email=req.body.email;
+      const query={email:email};
+      const existingUser=await usersCollection.findOne(query);
+      if(existingUser){
+        res.send({message:'user already exits'});
+      }
+      else{
+        const result=await usersCollection.insertOne(newUser);
+        res.send(result);
+      }
+    })
+
+
+
+    //movie database
     app.get('/movies', async(req,res)=>{
-            const cursor=collections.find();
+      const email=req.query.addedBy;
+      const query={};
+      if(email){
+        query.addedBy=email;
+      }
+            const cursor=collections.find(query);
             const result=await cursor.toArray();
             res.send(result);
         });
