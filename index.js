@@ -3,6 +3,7 @@ const cors=require('cors');
 const app=express();
 const port= process.env.port || 3000;
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const {ObjectId}=require('mongodb');
 
 //middleware
 app.use(cors());
@@ -50,7 +51,30 @@ async function run() {
 
 
     //movie database
+    //get movies by genres
     app.get('/movies', async(req,res)=>{
+      try{
+        const {genres,addedBy}=req.query;
+        let query={};
+        if(addedBy){
+          query.addedBy=addedBy;
+        }
+        if(genres){
+          const genresArray=genres.split(',');
+          query.genre={$in:genresArray};
+        }
+        const cursor=collections.find(query);
+        const result=await cursor.toArray();
+        res.send(result);
+
+      }
+      catch{
+        res.status(500).send({error: 'Failed to fetch the movie'})
+      }
+      
+    })
+
+    app.get('/movies/:id', async(req,res)=>{
       const email=req.query.addedBy;
       const query={};
       if(email){
@@ -69,13 +93,22 @@ async function run() {
 
     app.patch('/movies/:id', async(req,res)=>{
             const id=req.params.id;
-            const updatedproduct=req.body;
+            const updatedMovie=req.body;
             const query={_id: new ObjectId(id)};
             const update={
                 $set:{
-                    MovieName:updatedproduct.MovieName,
-                    Genre:updatedproduct.Genre,
-                    RentPrice:updatedproduct.RentPrice
+                    title: updatedMovie.title,
+                    director: updatedMovie.director,
+                    cast: updatedMovie.cast,
+                    posterUrl: updatedMovie.posterUrl,
+                    releaseYear: updatedMovie.releaseYear,
+                    genre: updatedMovie.genre,
+                    duration: updatedMovie.duration,
+                    rating: updatedMovie.rating,
+                    language: updatedMovie.language,
+                    country: updatedMovie.country,
+                    plotSummary: updatedMovie.plotSummary,
+                    addedBy: updatedMovie.addedBy
                 }
             }
             const result=await collections.updateOne(query,update);
