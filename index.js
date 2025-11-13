@@ -142,6 +142,12 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/watchList', async(req,res)=>{
+      cursor=watchListCollection.find();
+      result= await cursor.toArray();
+      res.send(result);
+    })
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Movie Master Pro successfully connected to MongoDB!");
