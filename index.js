@@ -32,6 +32,7 @@ async function run() {
     const db=client.db('movieMasterPro');
     const collections=db.collection('movies');
     const usersCollection=db.collection('users');
+    const watchListCollection=db.collection('watchLists')
 
     //user database
     app.post('/users', async(req,res)=>{
@@ -133,6 +134,13 @@ async function run() {
             const result=await collections.deleteOne(query);
             res.send(result);
         });
+
+    //watchList DataBase
+    app.post('/watchList', async(req,res)=>{
+      const newWatchList=req.body;
+      const result=await watchListCollection.insertOne(newWatchList);
+      res.send(result);
+    })
 
 
     await client.db("admin").command({ ping: 1 });
