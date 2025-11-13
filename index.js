@@ -54,7 +54,7 @@ async function run() {
     //get movies by genres
     app.get('/movies', async(req,res)=>{
       try{
-        const {genres,addedBy}=req.query;
+        const {genres,addedBy,minRating,maxRating}=req.query;
         let query={};
         if(addedBy){
           query.addedBy=addedBy;
@@ -62,6 +62,18 @@ async function run() {
         if(genres){
           const genresArray=genres.split(',');
           query.genre={$in:genresArray};
+        }
+        if(minRating && maxRating){
+          query.rating={
+            $gte:parseFloat(minRating),
+            $lte:parseFloat(maxRating)
+          }
+        }
+        else if(minRating){
+          query.rating={$gte:parseFloat(minRating)}
+        }
+        else if(maxRating){
+          query.raating={$lte:patrseFloat(maxRating)}
         }
         const cursor=collections.find(query);
         const result=await cursor.toArray();
